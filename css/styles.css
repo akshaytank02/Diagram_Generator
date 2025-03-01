@@ -197,4 +197,14 @@ button:hover {
     margin-bottom: 20px;
 }
 
+#saveApiSettings {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #007bff;
+}
+
+#saveApiSettings:hover {
+    background-color: #0056b3;
+}
+
 /* ... rest of the CSS ... */ 

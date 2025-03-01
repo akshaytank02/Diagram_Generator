@@ -58,7 +58,7 @@ async function generateMermaidWithAI() {
         
         const endpoint = document.getElementById('apiEndpoint').value;
         const apiKey = document.getElementById('apiKey').value;
-        const model = document.getElementById('modelSelect').value;
+        const model = document.getElementById('modelInput').value;
         
         let mermaidCode = await callAIAPI(endpoint, apiKey, model, promptInput.value);
         mermaidCode = cleanupMermaidSyntax(mermaidCode);

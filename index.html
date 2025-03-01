@@ -31,10 +31,8 @@
                     <div id="apiSettings" style="display: none;">
                         <input type="text" id="apiEndpoint" placeholder="API Endpoint" />
                         <input type="password" id="apiKey" placeholder="API Key" />
-                        <select id="modelSelect">
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                        </select>
+                        <input type="text" id="modelInput" placeholder="Model Name (e.g., gpt-3.5-turbo)" />
+                        <button id="saveApiSettings" onclick="saveAPIConfiguration()">Save API Settings</button>
                     </div>
                     
                     <div id="loadingSpinner" style="display: none;">

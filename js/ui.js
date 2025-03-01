@@ -58,4 +58,30 @@ function displayMermaidCode(code) {
     } catch (error) {
         outputElement.innerHTML = `<div class="error">Error rendering diagram: ${error.message}</div>`;
     }
+}
+
+function saveAPIConfiguration() {
+    const endpoint = document.getElementById('apiEndpoint').value;
+    const apiKey = document.getElementById('apiKey').value;
+    const modelName = document.getElementById('modelInput').value;
+    
+    // Validate inputs
+    if (!endpoint || !apiKey || !modelName) {
+        alert('Please fill in all API configuration fields');
+        return;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('apiEndpoint', endpoint);
+    localStorage.setItem('apiKey', apiKey);
+    localStorage.setItem('modelName', modelName);
+    
+    // Visual feedback
+    const saveButton = document.getElementById('saveApiSettings');
+    const originalText = saveButton.textContent;
+    saveButton.textContent = 'Saved!';
+    setTimeout(() => {
+        saveButton.textContent = originalText;
+        toggleAPISettings(); // Close the settings panel
+    }, 1500);
 } 
