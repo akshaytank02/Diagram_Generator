@@ -10,7 +10,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // Load saved API settings
     const defaultEndpoint = "https://api.openai.com/v1/chat/completions";
     const defaultModel = "gpt-3.5-turbo";
-    const defaultApiKey = "";
+    const defaultApiKey = "sk-proj-0123456789abcdef0123456789abcdef";
+
     
     const savedEndpoint = localStorage.getItem('apiEndpoint') || defaultEndpoint;
     const savedModel = localStorage.getItem('modelName') || defaultModel;

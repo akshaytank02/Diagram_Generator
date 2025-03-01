@@ -1,4 +1,3 @@
-// API-related functions
 async function callAIAPI(endpoint, apiKey, model, prompt) {
     try {
         const response = await fetch(endpoint, {
