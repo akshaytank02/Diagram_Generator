@@ -7,19 +7,17 @@ async function callAIAPI(endpoint, apiKey, model, prompt) {
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: model,
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a Mermaid.js diagram expert. Generate only valid Mermaid.js code without any explanation or markdown backticks. Ensure proper syntax and indentation. The diagram should be minimal and focused."
-                    },
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 2000
+                inputs: `Generate a Mermaid.js diagram for: ${prompt}
+                Rules:
+                - Output only valid Mermaid.js code
+                - No explanations or markdown backticks
+                - Ensure proper syntax and indentation
+                - Keep the diagram minimal and focused`,
+                parameters: {
+                    max_new_tokens: 2000,
+                    temperature: 0.7,
+                    return_full_text: false
+                }
             })
         });
 
@@ -32,14 +30,14 @@ async function callAIAPI(endpoint, apiKey, model, prompt) {
             } else if (response.status === 403) {
                 errorMessage = "Access forbidden. Please check your API key permissions.";
             } else if (errorData.error) {
-                errorMessage += ` - ${errorData.error.message || errorData.error}`;
+                errorMessage += ` - ${errorData.error}`;
             }
             
             throw new Error(errorMessage);
         }
 
         const data = await response.json();
-        return data.choices[0].message.content.trim();
+        return Array.isArray(data) ? data[0].generated_text.trim() : data.generated_text.trim();
     } catch (error) {
         console.error('API call error:', error);
         throw error;

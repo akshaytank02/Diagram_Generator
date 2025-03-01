@@ -8,9 +8,9 @@ mermaid.initialize({
 // Load saved settings and history on page load
 window.addEventListener('DOMContentLoaded', () => {
     // Load saved API settings
-    const defaultEndpoint = "https://api.openai.com/v1/chat/completions";
-    const defaultModel = "gpt-3.5-turbo";
-    const defaultApiKey = "sk-proj-0123456789abcdef0123456789abcdef";
+    const defaultEndpoint = "https://api-inference.huggingface.co/models/bigcode/starcoder";
+    const defaultModel = "bigcode/starcoder";
+    const defaultApiKey = ""; // Will be filled through UI
 
     
     const savedEndpoint = localStorage.getItem('apiEndpoint') || defaultEndpoint;

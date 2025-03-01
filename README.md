@@ -17,4 +17,4 @@ A web-based tool that uses AI to generate Mermaid.js diagrams from natural langu
 
 ## Dependencies
 - Mermaid.js v10.8.0
-- OpenAI API (or compatible API endpoint) 
+- Hugging Face Inference API 
