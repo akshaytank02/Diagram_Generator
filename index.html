@@ -24,15 +24,6 @@
                     <textarea id="promptInput" placeholder="Describe the diagram you want to create..."></textarea>
                     <div class="controls">
                         <button id="generateBtn">Generate Diagram</button>
-                        <button onclick="toggleAPISettings()">API Settings</button>
-                    </div>
-                    
-                    <!-- API Settings Panel -->
-                    <div id="apiSettings" style="display: none;">
-                        <input type="text" id="apiEndpoint" placeholder="API Endpoint" />
-                        <input type="password" id="apiKey" placeholder="API Key" />
-                        <input type="text" id="modelInput" placeholder="Model Name (e.g., gpt-3.5-turbo)" />
-                        <button id="saveApiSettings" onclick="saveAPIConfiguration()">Save API Settings</button>
                     </div>
                     
                     <div id="loadingSpinner" style="display: none;">

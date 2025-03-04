@@ -1,46 +1,85 @@
-async function callAIAPI(endpoint, apiKey, model, prompt) {
+async function callAIAPI(prompt) {
+    const GEMINI_API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    const GEMINI_API_KEY = 'AIzaSyClSGiiwX26VZrOq32cwEUan1cI0YmVVxc';
+
+    const timeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('API request timed out after 30 seconds')), 30000)
+    );
+
     try {
-        const response = await fetch(endpoint, {
+        const fetchPromise = fetch(`${GEMINI_API_ENDPOINT}?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                inputs: `Generate a Mermaid.js diagram for: ${prompt}
-                Rules:
-                - Output only valid Mermaid.js code
-                - No explanations or markdown backticks
-                - Ensure proper syntax and indentation
-                - Keep the diagram minimal and focused`,
-                parameters: {
-                    max_new_tokens: 2000,
-                    temperature: 0.7,
-                    return_full_text: false
+                contents: {
+                    role: "user",
+                    parts: [{ text: `Generate a simple Mermaid.js diagram for: ${prompt}
+                        Important Rules:
+                        - Start with exactly one of these: graph TD, graph LR, sequenceDiagram, classDiagram, stateDiagram, erDiagram, gantt, pie, mindmap
+                        - Use only basic Mermaid.js syntax
+                        - For flowcharts, use only --> for connections
+                        - Keep node names simple and alphanumeric
+                        - No special characters except underscore
+                        - Output ONLY the diagram code
+                        - No explanations or comments
+                        - No markdown backticks
+                        Example format for flowchart:
+                        graph TD
+                            A[Start] --> B[Process]
+                            B --> C[End]`
+                    }]
                 }
             })
         });
 
+        const response = await Promise.race([fetchPromise, timeout]);
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            let errorMessage = `API request failed: (${response.status})`;
-            
-            if (response.status === 401) {
-                errorMessage = "Invalid API key. Please check your API key and try again.";
-            } else if (response.status === 403) {
-                errorMessage = "Access forbidden. Please check your API key permissions.";
-            } else if (errorData.error) {
-                errorMessage += ` - ${errorData.error}`;
-            }
-            
-            throw new Error(errorMessage);
+            throw new Error(`API request failed (${response.status})`);
         }
 
         const data = await response.json();
-        return Array.isArray(data) ? data[0].generated_text.trim() : data.generated_text.trim();
+        let mermaidCode = data.candidates[0].content.parts[0].text;
+        
+        // Clean up the response
+        mermaidCode = mermaidCode
+            .trim()
+            .replace(/```(?:mermaid)?\n?/g, '')
+            .replace(/```/g, '')
+            .replace(/[\u2013\u2014\u2015\u2212]/g, '-') // Replace various dash types with simple hyphen
+            .replace(/[^\x20-\x7E\n]/g, '') // Remove non-ASCII characters
+            .trim();
+
+        // Validate diagram type
+        const validStart = /^(graph [TBLR]D|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|mindmap)/;
+        if (!validStart.test(mermaidCode)) {
+            const type = prompt.toLowerCase().includes('sequence') ? 'sequenceDiagram' :
+                        prompt.toLowerCase().includes('class') ? 'classDiagram' :
+                        prompt.toLowerCase().includes('state') ? 'stateDiagram' :
+                        prompt.toLowerCase().includes('er') ? 'erDiagram' :
+                        prompt.toLowerCase().includes('gantt') ? 'gantt' :
+                        prompt.toLowerCase().includes('pie') ? 'pie' :
+                        prompt.toLowerCase().includes('mind') ? 'mindmap' :
+                        'graph TD';
+            
+            mermaidCode = `${type}\n${mermaidCode}`;
+        }
+
+        // Basic syntax validation
+        if (mermaidCode.includes('---')) {
+            mermaidCode = mermaidCode.replace(/---/g, '-->');
+        }
+
+        // Ensure proper line breaks
+        mermaidCode = mermaidCode.replace(/([A-Za-z0-9\]}"'])\s+(-->|==>|--)/g, '$1\n    $2');
+
+        return mermaidCode;
+
     } catch (error) {
         console.error('API call error:', error);
-        throw error;
+        throw new Error(error.message || 'Failed to generate diagram');
     }
 }
 
@@ -53,11 +92,7 @@ async function generateMermaidWithAI() {
         loadingSpinner.style.display = 'block';
         errorDisplay.textContent = '';
         
-        const endpoint = document.getElementById('apiEndpoint').value;
-        const apiKey = document.getElementById('apiKey').value;
-        const model = document.getElementById('modelInput').value;
-        
-        let mermaidCode = await callAIAPI(endpoint, apiKey, model, promptInput.value);
+        let mermaidCode = await callAIAPI(promptInput.value);
         mermaidCode = cleanupMermaidSyntax(mermaidCode);
         
         if (!validateMermaidCode(mermaidCode)) {
@@ -69,7 +104,7 @@ async function generateMermaidWithAI() {
         
     } catch (error) {
         errorDisplay.textContent = `Error: ${error.message}`;
-        generateFallbackDiagram(promptInput.value, 'flowchart');
+        generateFallbackDiagram(promptInput.value);
     } finally {
         loadingSpinner.style.display = 'none';
     }
