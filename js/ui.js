@@ -84,4 +84,14 @@ function saveAPIConfiguration() {
         saveButton.textContent = originalText;
         toggleAPISettings(); // Close the settings panel
     }, 1500);
-} 
+}
+
+// Add event listeners for tabs
+document.addEventListener('DOMContentLoaded', () => {
+    // Set up tab click handlers
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchTab(tab.getAttribute('data-tab'));
+        });
+    });
+}); 
