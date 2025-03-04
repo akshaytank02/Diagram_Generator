@@ -5,71 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Diagram Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.8.0/mermaid.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-    <div class="container">
-        <h1>AI Diagram Generator</h1>
-        
-        <div class="card">
-            <div class="tab-container">
-                <div class="tab active" data-tab="prompt">Prompt</div>
-                <div class="tab" data-tab="examples">Examples</div>
-                <div class="tab" data-tab="history">History</div>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="min-h-screen p-4 md:p-6 lg:p-8">
+        <!-- Header -->
+        <header class="max-w-[1920px] mx-auto mb-6 md:mb-8">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-diagram-project text-indigo-600"></i>
+                    AI Diagram Generator
+                </h1>
             </div>
-            
-            <!-- Prompt Tab -->
-            <div class="tab-content" data-tab="prompt" style="display: block;">
-                <div class="input-section">
-                    <textarea id="promptInput" placeholder="Describe the diagram you want to create..."></textarea>
-                    <div class="controls">
-                        <button id="generateBtn">Generate Diagram</button>
+        </header>
+
+        <!-- Main Content -->
+        <div class="max-w-[1920px] mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <!-- Left Column -->
+            <div class="space-y-6 h-full">
+                <!-- Input Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full">
+                    <div class="flex border-b border-gray-200">
+                        <button class="tab active px-6 py-4 text-sm font-medium" data-tab="prompt">
+                            <i class="fas fa-pen-to-square mr-2"></i>Prompt
+                        </button>
+                        <button class="tab px-6 py-4 text-sm font-medium" data-tab="examples">
+                            <i class="fas fa-lightbulb mr-2"></i>Examples
+                        </button>
+                        <button class="tab px-6 py-4 text-sm font-medium" data-tab="history">
+                            <i class="fas fa-clock-rotate-left mr-2"></i>History
+                        </button>
                     </div>
-                    
-                    <div id="loadingSpinner" style="display: none;">
-                        <div class="spinner"></div>
+
+                    <!-- Prompt Tab -->
+                    <div class="tab-content p-6" data-tab="prompt">
+                        <div class="space-y-4">
+                            <textarea 
+                                id="promptInput" 
+                                class="w-full h-48 md:h-64 p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                placeholder="Describe the diagram you want to create..."></textarea>
+                            <div class="flex justify-between items-center">
+                                <button id="generateBtn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-lg">
+                                    <i class="fas fa-wand-magic-sparkles"></i>
+                                    Generate Diagram
+                                </button>
+                                <div id="loadingSpinner" class="hidden">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                            <div id="errorDisplay" class="text-red-500"></div>
+                        </div>
                     </div>
-                    <div id="errorDisplay" class="error"></div>
+
+                    <!-- Examples Tab -->
+                    <div class="tab-content hidden p-6" data-tab="examples">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('flowchart')">
+                                <i class="fas fa-sitemap mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Flowchart</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('sequence')">
+                                <i class="fas fa-arrow-right-arrow-left mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Sequence Diagram</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('classDiagram')">
+                                <i class="fas fa-cube mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Class Diagram</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('stateDiagram')">
+                                <i class="fas fa-circle-nodes mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">State Diagram</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('erDiagram')">
+                                <i class="fas fa-database mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">ER Diagram</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('gantt')">
+                                <i class="fas fa-chart-gantt mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Gantt Chart</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('pie')">
+                                <i class="fas fa-chart-pie mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Pie Chart</h3>
+                            </div>
+                            <div class="example-item p-4 border border-gray-200 rounded-lg hover:border-indigo-500 cursor-pointer transition-colors" onclick="loadExample('mindmap')">
+                                <i class="fas fa-brain mb-2 text-indigo-600 text-xl"></i>
+                                <h3 class="font-medium">Mind Map</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Tab -->
+                    <div class="tab-content hidden p-6" data-tab="history">
+                        <div class="space-y-4">
+                            <div class="flex justify-end">
+                                <button id="clearHistoryBtn" onclick="clearHistory()" class="text-sm text-red-500 hover:text-red-600 flex items-center gap-2">
+                                    <i class="fas fa-trash"></i>
+                                    Clear History
+                                </button>
+                            </div>
+                            <div id="historyContainer" class="space-y-3 max-h-[600px] overflow-y-auto"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Examples Tab -->
-            <div class="tab-content" data-tab="examples" style="display: none;">
-                <div class="examples-section">
-                    <div class="example-item" onclick="loadExample('flowchart')">Flowchart Example</div>
-                    <div class="example-item" onclick="loadExample('sequence')">Sequence Diagram Example</div>
-                    <div class="example-item" onclick="loadExample('classDiagram')">Class Diagram Example</div>
-                    <div class="example-item" onclick="loadExample('stateDiagram')">State Diagram Example</div>
-                    <div class="example-item" onclick="loadExample('erDiagram')">ER Diagram Example</div>
-                    <div class="example-item" onclick="loadExample('gantt')">Gantt Chart Example</div>
-                    <div class="example-item" onclick="loadExample('pie')">Pie Chart Example</div>
-                    <div class="example-item" onclick="loadExample('mindmap')">Mind Map Example</div>
+
+            <!-- Right Column -->
+            <div class="space-y-6 h-full">
+                <!-- Code Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-800 text-lg">Diagram Code</h3>
+                        <button class="copy-btn text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2" onclick="copyCode()">
+                            <i class="far fa-copy"></i>
+                            Copy Code
+                        </button>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <pre id="mermaidCode" class="text-sm text-gray-800 font-mono max-h-[300px] overflow-y-auto">// Diagram code will appear here after generation</pre>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-grow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-gray-800 text-lg">Preview</h3>
+                    </div>
+                    <div class="p-6">
+                        <div id="mermaidOutput" class="flex justify-center overflow-x-auto"></div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- History Tab -->
-            <div class="tab-content" data-tab="history" style="display: none;">
-                <div class="history-section">
-                    <button id="clearHistoryBtn" onclick="clearHistory()">Clear History</button>
-                    <div id="historyContainer"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3>Diagram Code</h3>
-            <div class="code-container">
-                <pre id="mermaidCode">// Diagram code will appear here after generation</pre>
-                <button class="copy-btn" onclick="copyCode()">Copy</button>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3>Preview</h3>
-            <div id="mermaidOutput"></div>
         </div>
     </div>
-    
+
     <script src="js/api.js"></script>
     <script src="js/history.js"></script>
     <script src="js/examples.js"></script>
